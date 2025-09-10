@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-2$385xm!ep*#tx2s65fb(m1jfud-9j1^7(($6#3lfn!ig786-u
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", 'vidia-qonita-footballshop.pbp.cs.ui.ac.id']
 
 
 # Application definition
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'main'
 ]
 
 MIDDLEWARE = [
