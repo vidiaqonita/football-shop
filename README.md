@@ -1,36 +1,36 @@
 tautan ke aplikasi PWS: https://pbp.cs.ui.ac.id/web/project/vidia.qonita/footballshop
 1. Implementasi checklist tugas 2:
    ✅ Membuat proyek django baru
-       Step-by-step: 
-        1. Membuat direktori proyek
-        2. Mengaktifkan virtual environment dengan perintah `source env/bin/activate`
-           (kalo belum install, gunakan perintah `python3 -m venv env` dulu)
-        3. Membuat berkas requirements.txt untuk memuat dependencies (termasuk django)
-        4. Gunakan perintah `pip install -r requirements.txt`. 
-           Perintah ini akan menginstall dependencies yang sudah ditulis di requirements.txt
-        5. Membuat proyek django dengan perintah `django-admin startproject football-shop .`.
-        6. Mengatur konfigurasi environment untuk proyek
-    ✅ Membuat aplikasi dengan nama 'main' pada proyek
-       Step-by-step: 
-       1. Pada direktori proyek, tulis perintah 'python manage.py startapp main'.
-       2. Mendaftarkan aplikasi main ke proyek, dengan cara menambahkan 'main' pada INSTALLED_APPS di settings.py.
-    ✅ Melakukan routing pada proyek agar dapat menjalankan aplikasi main.
-       Step-by-step: 
-       1. Membuka berkas urls.py di football-shop.
-       2. import include, untuk mengimpor pola rute URL dari aplikasi lain
-       3. tulis:
+   Step-by-step: 
+   1. Membuat direktori proyek
+   2. Mengaktifkan virtual environment dengan perintah `source env/bin/activate`
+         (kalo belum install, gunakan perintah `python3 -m venv env` dulu)
+   3. Membuat berkas requirements.txt untuk memuat dependencies (termasuk django)
+   4. Gunakan perintah `pip install -r requirements.txt`. 
+         Perintah ini akan menginstall dependencies yang sudah ditulis di requirements.txt
+   5. Membuat proyek django dengan perintah `django-admin startproject football-shop .`.
+   6. Mengatur konfigurasi environment untuk proyek
+   ✅ Membuat aplikasi dengan nama 'main' pada proyek
+   Step-by-step: 
+   1. Pada direktori proyek, tulis perintah 'python manage.py startapp main'.
+   2. Mendaftarkan aplikasi main ke proyek, dengan cara menambahkan 'main' pada INSTALLED_APPS di settings.py.
+   ✅ Melakukan routing pada proyek agar dapat menjalankan aplikasi main.
+   Step-by-step: 
+   1. Membuka berkas urls.py di football-shop.
+   2. import include, untuk mengimpor pola rute URL dari aplikasi lain
+   3. tulis:
        ```
            urlpatterns = [
         ...
         path('', include('main.urls')), # path akan diarahkan ke route dalam aplikasi main
         ...
-    ]
+       ]
        ```
-    ✅ Membuat model pada aplikasi main dengan nama Product 
-       Step-by-step:
-       1. buka models.py dan namai class dengan Product.
-       2. tulis CATEGORY_CHOICES berisi list kategori barang (bebas)
-       3. tambahkan atribut-atribut wajib:
+   ✅ Membuat model pada aplikasi main dengan nama Product 
+   Step-by-step:
+   1. buka models.py dan namai class dengan Product.
+   2. tulis CATEGORY_CHOICES berisi list kategori barang (bebas)
+   3. tambahkan atribut-atribut wajib:
        ```
        id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # id barang (tidak wajib sih)
        name = models.CharField(max_length=255) # nama
@@ -41,10 +41,10 @@ tautan ke aplikasi PWS: https://pbp.cs.ui.ac.id/web/project/vidia.qonita/footbal
        is_featured = models.BooleanField(default=False) # featured or not
        ```
    
-    ✅ Membuat fungsi pada views.py untuk file html yang menunjukkan nama aplikasi, nama mahasiswa, dan kelas.
-       Step-by-step: 
-       1. buka views.py
-       2. tulis:
+   ✅ Membuat fungsi pada views.py untuk file html yang menunjukkan nama aplikasi, nama mahasiswa, dan kelas.
+   Step-by-step: 
+   1. buka views.py
+   2. tulis:
      ```
      from django.urls import path
      from main.views import show_main # impor show_main yang dipanggil saat url cocok 
@@ -55,10 +55,10 @@ tautan ke aplikasi PWS: https://pbp.cs.ui.ac.id/web/project/vidia.qonita/footbal
      path('', show_main, name='show_main'), # route '' yang akan memanggil show_main
      ]
      ```
-    ✅ Membuat routing pada urls.py di aplikasi main untuk memetakan fungsi yang sudah dibuat di views.py
-       Step-by-step: 
-       1. Membuat berkas urls.py pada aplikasi main.
-       2. tulis:
+   ✅ Membuat routing pada urls.py di aplikasi main untuk memetakan fungsi yang sudah dibuat di views.py
+   Step-by-step: 
+   1. Membuat berkas urls.py pada aplikasi main.
+   2. tulis:
      ```
      from django.urls import path
      from main.views import show_main
@@ -97,5 +97,6 @@ tautan ke aplikasi PWS: https://pbp.cs.ui.ac.id/web/project/vidia.qonita/footbal
     - dokumentasi django ramah pemula dan detail, karena sudah banyak sekali developer menggunakannya. hal ini memudahkan pemula untuk belajar secara mandiri
     - menggunakan praktek yang baik, seperti keamanan dan environment, yang berguna untuk membangun proyek nyata di industri
 6. Feedback untuk asisten dosen tutorial 1: Terima kasih sudah memberikan tutorial yang begitu detail dan jelas, sehingga memudahkan saya untuk belajar pbp dengan django dan menggunakan git
+
 
 
