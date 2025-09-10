@@ -70,7 +70,7 @@ tautan ke aplikasi PWS: https://pbp.cs.ui.ac.id/web/project/vidia.qonita/footbal
      ]
      ```
 3. ![Screenshot dari https://python.plainenglish.io/the-mvt-design-pattern-of-django-8fd47c61f582](/football-shop/request_to_client_web.png)
-   Penjelasan:
+Penjelasan:
    - user mengirim request ke web
    - request masuk ke url dispatcher untuk dicocokkan ke path di views.py
    - jika cocok, request diarahkan ke path yang sesuai
@@ -97,6 +97,7 @@ tautan ke aplikasi PWS: https://pbp.cs.ui.ac.id/web/project/vidia.qonita/footbal
     - dokumentasi django ramah pemula dan detail, karena sudah banyak sekali developer menggunakannya. hal ini memudahkan pemula untuk belajar secara mandiri
     - menggunakan praktek yang baik, seperti keamanan dan environment, yang berguna untuk membangun proyek nyata di industri
 6. Feedback untuk asisten dosen tutorial 1: Terima kasih sudah memberikan tutorial yang begitu detail dan jelas, sehingga memudahkan saya untuk belajar pbp dengan django dan menggunakan git
+
 
 
 
