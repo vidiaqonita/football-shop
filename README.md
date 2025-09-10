@@ -1,19 +1,19 @@
 tautan ke aplikasi PWS: https://pbp.cs.ui.ac.id/web/project/vidia.qonita/footballshop
 1. Implementasi checklist tugas 2:
-    ✅ Membuat proyek django baru
-        Step-by-step: 
+   ✅ Membuat proyek django baru
+       Step-by-step: 
         1. Membuat direktori proyek
-        2. Mengaktifkan virtual environment dengan perintah `source env/bin/activate` 
-            (kalo belum install, gunakan perintah `python3 -m venv env` dulu)
+        2. Mengaktifkan virtual environment dengan perintah `source env/bin/activate`
+           (kalo belum install, gunakan perintah `python3 -m venv env` dulu)
         3. Membuat berkas requirements.txt untuk memuat dependencies (termasuk django)
         4. Gunakan perintah `pip install -r requirements.txt`. 
-            Perintah ini akan menginstall dependencies yang sudah ditulis di requirements.txt
+           Perintah ini akan menginstall dependencies yang sudah ditulis di requirements.txt
         5. Membuat proyek django dengan perintah `django-admin startproject football-shop .`.
         6. Mengatur konfigurasi environment untuk proyek
     ✅ Membuat aplikasi dengan nama 'main' pada proyek
-        Step-by-step: 
-        1. Pada direktori proyek, tulis perintah 'python manage.py startapp main'.
-        2. Mendaftarkan aplikasi main ke proyek, dengan cara menambahkan 'main' pada INSTALLED_APPS di settings.py.
+       Step-by-step: 
+       1. Pada direktori proyek, tulis perintah 'python manage.py startapp main'.
+       2. Mendaftarkan aplikasi main ke proyek, dengan cara menambahkan 'main' pada INSTALLED_APPS di settings.py.
     ✅ Melakukan routing pada proyek agar dapat menjalankan aplikasi main.
        Step-by-step: 
        1. Membuka berkas urls.py di football-shop.
@@ -97,3 +97,4 @@ Penjelasan:
     - dokumentasi django ramah pemula dan detail, karena sudah banyak sekali developer menggunakannya. hal ini memudahkan pemula untuk belajar secara mandiri
     - menggunakan praktek yang baik, seperti keamanan dan environment, yang berguna untuk membangun proyek nyata di industri
 6. Feedback untuk asisten dosen tutorial 1: Terima kasih sudah memberikan tutorial yang begitu detail dan jelas, sehingga memudahkan saya untuk belajar pbp dengan django dan menggunakan git
+
