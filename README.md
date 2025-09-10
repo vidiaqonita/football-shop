@@ -69,7 +69,7 @@ tautan ke aplikasi PWS: https://pbp.cs.ui.ac.id/web/project/vidia.qonita/footbal
        path('', show_main, name='show_main'),
      ]
      ```
-3. ![Screenshot dari https://python.plainenglish.io/the-mvt-design-pattern-of-django-8fd47c61f582](request_to_client_web.png)
+3. ![Screenshot dari https://python.plainenglish.io/the-mvt-design-pattern-of-django-8fd47c61f582](request_client_to_web.png)
 Penjelasan:
    - user mengirim request ke web
    - request masuk ke url dispatcher untuk dicocokkan ke path di views.py
