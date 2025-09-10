@@ -70,14 +70,14 @@ tautan ke aplikasi PWS: https://pbp.cs.ui.ac.id/web/project/vidia.qonita/footbal
      ]
      ```
 3. ![Screenshot dari https://python.plainenglish.io/the-mvt-design-pattern-of-django-8fd47c61f582](/football-shop/request_to_client_web.png)
-Penjelasan:
-- user mengirim request ke web
-- request masuk ke url dispatcher untuk dicocokkan ke path di views.py
-- jika cocok, request diarahkan ke path yang sesuai
-- views.py dapat mengambil data dari models.py atau menulisnya
-- setelah itu, views.py mengirimnya ke template untuk ditampilkan
-- template digunakan untuk membuat tampilan yang dilihat user 
-- setelah views.py mengirim data, template akan merender html 
+   Penjelasan:
+   - user mengirim request ke web
+   - request masuk ke url dispatcher untuk dicocokkan ke path di views.py
+   - jika cocok, request diarahkan ke path yang sesuai
+   - views.py dapat mengambil data dari models.py atau menulisnya
+   - setelah itu, views.py mengirimnya ke template untuk ditampilkan
+   - template digunakan untuk membuat tampilan yang dilihat user 
+   - setelah views.py mengirim data, template akan merender html 
 - setelah menghasilkan html, hasil yang ditampilkan dikirim ke django sebagai **response**, dan user bisa melihat halaman tersebut
 3. Peran settings.py dalam proyek django: 
     Sebagai konfigurasi utama aplikasi dan proyek. Pada settings.py, kita dapat mengatur:
@@ -97,4 +97,5 @@ Penjelasan:
     - dokumentasi django ramah pemula dan detail, karena sudah banyak sekali developer menggunakannya. hal ini memudahkan pemula untuk belajar secara mandiri
     - menggunakan praktek yang baik, seperti keamanan dan environment, yang berguna untuk membangun proyek nyata di industri
 6. Feedback untuk asisten dosen tutorial 1: Terima kasih sudah memberikan tutorial yang begitu detail dan jelas, sehingga memudahkan saya untuk belajar pbp dengan django dan menggunakan git
+
 
