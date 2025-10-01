@@ -123,3 +123,15 @@ def edit_product(request, id):
     }
 
     return render(request, "edit_product.html", context)
+def category_view(request, category):
+    if category not in [choice[0] for choice in Product.CATEGORY_CHOICES]:
+        return render(request, '404.html')  # or redirect to main page
+
+    product_list = Product.objects.filter(category=category)
+
+    context = {
+        'product_list': product_list,
+        'selected_category': category,
+        'CATEGORY_CHOICES': Product.CATEGORY_CHOICES
+    }
+    return render(request, 'main.html', context)
