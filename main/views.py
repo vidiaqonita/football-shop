@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
@@ -11,6 +11,9 @@ from main.forms import ProductForm
 from main.models import Product
 from django.http import HttpResponse
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils.html import strip_tags
 # Create your views here.
 
 @login_required(login_url='/login')
@@ -34,23 +37,24 @@ def show_main(request):
 @login_required(login_url='/login')
 def show_product(request, id):
     product = get_object_or_404(Product, pk=id)
-
+    author_name = product.user.username if product.user_id else "Anonymous"
     context = {
-        'product': product
+        'product': product,
+        'author_name': author_name,
     }
-
     return render(request, "product_detail.html", context)
 
 def create_product(request):
     form = ProductForm(request.POST or None)
 
     if form.is_valid() and request.method == "POST":
-        news_entry = form.save(commit = False)
-        news_entry.user = request.user
-        news_entry.save()
+        product_entry = form.save(commit = False)
+        product_entry.user = request.user
+        product_entry.save()
         return redirect('main:show_main')
     context = {'form': form}
     return render(request, "create_product.html", context)
+
 
 def show_xml(request):
      product_list = Product.objects.all()
@@ -59,9 +63,21 @@ def show_xml(request):
 
 def show_json(request):
     product_list = Product.objects.all()
-    json_data = serializers.serialize("json", product_list)
-    return HttpResponse(json_data, content_type="application/json")
+    data = [
+        {
+            'id': str(product.id),
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'category': product.category,
+            'thumbnail': product.thumbnail,
+            'is_featured': product.is_featured,
+            'user_id': product.user_id,
+        }
+        for product in product_list
+    ]
 
+    return JsonResponse(data, safe=False)
 def show_xml_by_id(request, product_id):
    try:
        product_item = Product.objects.filter(pk=product_id)
@@ -70,12 +86,22 @@ def show_xml_by_id(request, product_id):
    except Product.DoesNotExist:
        return HttpResponse(status=404)
 def show_json_by_id(request, product_id):
-   try:
-       product_item = Product.objects.get(pk=product_id)
-       json_data = serializers.serialize("json", [product_item])
-       return HttpResponse(json_data, content_type="application/json")
-   except Product.DoesNotExist:
-       return HttpResponse(status=404)
+    try:
+        product = Product.objects.select_related('user').get(pk=product_id)
+        data = {
+            'id': str(product.id),
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'category': product.category,
+            'thumbnail': product.thumbnail,
+            'is_featured': product.is_featured,
+            'user_id': product.user_id,
+            'user_username': product.user.username if product.user_id else "Anonymous",
+        }
+        return JsonResponse(data)
+    except Product.DoesNotExist:
+        return JsonResponse({'detail': 'Not found'}, status=404)
 def register(request):
     form = UserCreationForm()
 
@@ -124,14 +150,53 @@ def edit_product(request, id):
 
     return render(request, "edit_product.html", context)
 def category_view(request, category):
-    if category not in [choice[0] for choice in Product.CATEGORY_CHOICES]:
-        return render(request, '404.html')  # or redirect to main page
+    valid_categories = [choice[0] for choice in Product.CATEGORY_CHOICES]
 
-    product_list = Product.objects.filter(category=category)
+    if category not in valid_categories:
+        return render(request, '404.html')
 
-    context = {
-        'product_list': product_list,
-        'selected_category': category,
-        'CATEGORY_CHOICES': Product.CATEGORY_CHOICES
-    }
-    return render(request, 'main.html', context)
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        product_list = Product.objects.filter(category=category).select_related('user')
+        data = [
+            {
+                "id": str(p.id),
+                "name": p.name,
+                "description": p.description,
+                "category": p.category,
+                "thumbnail": p.thumbnail.url if p.thumbnail else "/static/image/no-product.png",
+                "user_id": p.user_id if p.user else None,
+                "user_username": p.user.username if p.user else "Anonymous",
+                "is_featured": getattr(p, "is_featured", False),
+            }
+            for p in product_list
+        ]
+        return JsonResponse(data, safe=False)
+
+    return render(request, 'main.html', {
+        "selected_category": category,
+        "CATEGORY_CHOICES": Product.CATEGORY_CHOICES
+    })
+
+@csrf_exempt
+@require_POST
+def add_product_entry_ajax(request):
+    name = strip_tags(request.POST.get("name"))
+    description = strip_tags(request.POST.get("description"))
+    price = request.POST.get("price")
+    category = request.POST.get("category")
+    thumbnail = request.POST.get("thumbnail")
+    is_featured = request.POST.get("is_featured") == 'on'  # checkbox handling
+    user = request.user
+
+    new_product = Product(
+        name=name, 
+        description=description,
+        price=price,
+        category=category,
+        thumbnail=thumbnail,
+        is_featured=is_featured,
+        user=user
+    )
+    new_product.save()
+
+    return HttpResponse(b"CREATED", status=201)

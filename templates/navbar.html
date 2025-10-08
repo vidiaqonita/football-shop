@@ -6,34 +6,38 @@
             <span class="text-pink-600">Snitch</span> Football
           </h1>
         </div>
-        
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center space-x-8">
           <a href="/" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
             Home
           </a>
+
+          <!-- Individual Category Links -->
+          <a href="{% url 'main:category_view' 'new' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+            New
+          </a>
+          <a href="{% url 'main:category_view' 'apparel' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+            Apparel
+          </a>
+          <a href="{% url 'main:category_view' 'kids' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+            Kids
+          </a>
+          <a href="{% url 'main:category_view' 'brands' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+            Brands
+          </a>
+          <a href="{% url 'main:category_view' 'footwear' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+            Footwear
+          </a>
+          <a href="{% url 'main:category_view' 'equipment' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+            Equipment
+          </a>
+          <a href="{% url 'main:category_view' 'sale' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+            Sale
+          </a>
+
           <a href="{% url 'main:create_product' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
             Create Product
           </a>
-
-          <!-- Category Dropdown -->
-          <div class="relative group">
-            <button class="text-gray-600 hover:text-gray-900 font-medium transition-colors flex items-center">
-              Categories
-              <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div class="absolute hidden group-hover:block bg-white shadow-lg rounded mt-2 py-2 w-40">
-              <a href="{% url 'main:category' 'new' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">New</a>
-              <a href="{% url 'main:category' 'apparel' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Apparel</a>
-              <a href="{% url 'main:category' 'kids' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Kids</a>
-              <a href="{% url 'main:category' 'brands' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Brands</a>
-              <a href="{% url 'main:category' 'footwear' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Footwear</a>
-              <a href="{% url 'main:category' 'equipment' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Equipment</a>
-              <a href="{% url 'main:category' 'sale' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Sale</a>
-            </div>
-          </div>
         </div>
 
         <!-- Desktop User Section -->
@@ -84,13 +88,13 @@
         <div class="border-t border-gray-200 pt-4">
           <div class="font-medium text-gray-900 mb-2">Categories</div>
           <div class="space-y-1">
-            <a href="{% url 'main:category' 'new' %}" class="block text-gray-600 hover:text-gray-900 py-2">New</a>
-            <a href="{% url 'main:category' 'apparel' %}" class="block text-gray-600 hover:text-gray-900 py-2">Apparel</a>
-            <a href="{% url 'main:category' 'kids' %}" class="block text-gray-600 hover:text-gray-900 py-2">Kids</a>
-            <a href="{% url 'main:category' 'brands' %}" class="block text-gray-600 hover:text-gray-900 py-2">Brands</a>
-            <a href="{% url 'main:category' 'footwear' %}" class="block text-gray-600 hover:text-gray-900 py-2">Footwear</a>
-            <a href="{% url 'main:category' 'equipment' %}" class="block text-gray-600 hover:text-gray-900 py-2">Equipment</a>
-            <a href="{% url 'main:category' 'sale' %}" class="block text-gray-600 hover:text-gray-900 py-2">Sale</a>
+            <a href="{% url 'main:category_view' 'new' %}" class="block text-gray-600 hover:text-gray-900 py-2">New</a>
+            <a href="{% url 'main:category_view' 'apparel' %}" class="block text-gray-600 hover:text-gray-900 py-2">Apparel</a>
+            <a href="{% url 'main:category_view' 'kids' %}" class="block text-gray-600 hover:text-gray-900 py-2">Kids</a>
+            <a href="{% url 'main:category_view' 'brands' %}" class="block text-gray-600 hover:text-gray-900 py-2">Brands</a>
+            <a href="{% url 'main:category_view' 'footwear' %}" class="block text-gray-600 hover:text-gray-900 py-2">Footwear</a>
+            <a href="{% url 'main:category_view' 'equipment' %}" class="block text-gray-600 hover:text-gray-900 py-2">Equipment</a>
+            <a href="{% url 'main:category_view' 'sale' %}" class="block text-gray-600 hover:text-gray-900 py-2">Sale</a>
           </div>
         </div>
         <!-- Mobile User Section -->

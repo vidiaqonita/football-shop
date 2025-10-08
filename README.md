@@ -1,3 +1,4 @@
+"----- TUGAS 5 -----"
 ✅ Implementasikan fungsi untuk menghapus dan mengedit product.
 Step-by-step:
     
@@ -38,3 +39,29 @@ Pertanyaan tambahan:
     4. Jelaskan konsep flex box dan grid layout beserta kegunaannya!
     - Flexbox: Layout model yang memudahkan pengaturan elemen dalam satu dimensi (baris atau kolom). Fleksibel, cocok untuk layout sederhana seperti navbar, card list, atau form.
     - Grid: Layout model yang mengatur elemen dalam dua dimensi (baris dan kolom). Cocok untuk layout kompleks seperti dashboard, website dengan banyak section.
+
+"===== TUGAS 6 ====="
+✅ Apa perbedaan antara synchronous request dan asynchronous request?
+    synchronous request akan blokir browser sampai muncul response (maka user harus melihat browser yang terhenti prosesnya hingga response), sedangkan asynchronous request akan membiarkan halaman terus diproses selama menunggu response, sehingga pada user experience nya tidak terhenti dan halaman tetap responsif.
+✅ Bagaimana AJAX bekerja di Django (alur request–response)?
+    - Browser (JavaScript) mengirim request ke URL Django menggunakan AJAX (seperti fetch() atau $.ajax()).
+    - Django URLConf (urls.py) menerima request dan meneruskannya ke view terkait.
+    - View Django memproses data dan mengembalikan JSON response.
+    - JavaScript di browser menerima JSON tersebut dan memperbarui tampilan halaman tanpa reload.
+✅ Apa keuntungan menggunakan AJAX dibandingkan render biasa di Django?
+    Keuntungan: 
+    - Tidak perlu reload seluruh halaman saat request, cukup ambil dan ubah data yang diperlukan saja
+    - Responsif dan interaktif, tidak selama render biasa.
+    - secara User Experience, halaman berjalan dengan lebih smooth dan tidak kelihatan reload
+    - Tidak perlu kirim semua data HTML setiap request, cukup kirim data JSON yang kecil.
+✅ Bagaimana cara memastikan keamanan saat menggunakan AJAX untuk fitur Login dan Register di Django?
+    - Mengunakan csrf token, dengan menulis kode keamanannya di header AJAX request
+    - Menggunakan https, agar data username/password tidak dikirim dalam bentuk plaintext
+    - validasi input di server
+    - Pastikan kirim password melalui koneksi aman seperti django.contrib.auth.authenticate agar tidak terkirim dalam plaintext
+✅ Bagaimana AJAX mempengaruhi User Experience (UX) pada website?
+    - tidak perlu reload halaman sehingga interaksi terasa cepat (user experience yang baik)
+    - feedback langsung
+    - SPA-like experience (mirip aplikasi)
+    - cocok untuk fitur realtime, seperti chat dan notifikasi
+    - hati-hati, bila tidak diimplementasikan dengan baik, bisa membuat pengguna bingung. selain itu, terlalu banyak AJAX request bisa membebani server

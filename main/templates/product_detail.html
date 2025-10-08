@@ -2,9 +2,13 @@
 {% load static %}
 
 {% block meta %}
-<title>{{ product.name }} - Football Shop</title>
+<title>Product Detail - Football Shop</title>
 {% endblock meta %}
-
+<button
+  onclick="showToast('Sample Title', 'This is a sample message for the toast notification.')"
+>
+  Click to Show Toast
+</button>
 {% block content %}
 <div class="bg-gray-50 w-full min-h-screen">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -15,48 +19,51 @@
                 ← Back to Shop
             </a>
         </div>
-        
+
+        <!-- Loading State -->
+        <div id="loading-state" class="bg-white rounded-lg border border-gray-200 p-12 text-center">
+            <svg class="animate-spin h-8 w-8 text-pink-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            <p class="text-gray-600 mt-3">Loading product...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
+            <div class="w-16 h-16 mx-auto mb-4">
+                <div class="text-red-500 text-5xl">⚠️</div>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Failed to load page</h3>
+            <p class="text-gray-500">Please try again later.</p>
+        </div> 
         <!-- Article -->
-        <article class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <article id="article-content" class="bg-white rounded-lg border border-gray-200 overflow-hidden hidden">
             
             <!-- Header -->
             <div class="p-6 sm:p-8">
-                <div class="flex flex-wrap items-center gap-2 mb-4">
-                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-pink-600 text-white">
-                        {{ product.get_category_display }}
-                    </span>
-                    {% if product.is_featured %}
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
-                            Featured
-                        </span>
-                    {% endif %}
+                <div id="badges-container" class="flex flex-wrap items-center gap-2 mb-4">
+                    <!-- Dynamic badges will be inserted here -->
                 </div>
                 
-                <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-4">
-                    {{ product.name }}
+                <h1 id="article-name" class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-4">
+                    <!-- Name will be inserted here -->
                 </h1>
-                
-                <div class="flex flex-wrap items-center text-sm text-gray-500 gap-4">
-                    <time datetime="{{ product.created_at|date:'c' }}">
-                        {{ product.created_at|date:"M j, Y g:i A" }}
-                    </time>
-                </div>
             </div>
 
             <!-- Featured Image -->
-            {% if product.thumbnail %}
-                <div class="px-6 sm:px-8">
-                    <img src="{{ product.thumbnail }}" 
-                         alt="{{ product.name }}" 
-                         class="w-full h-64 sm:h-80 lg:h-96 object-cover rounded-lg">
-                </div>
-            {% endif %}
+            <div id="featured-image-container" class="px-6 sm:px-8 hidden">
+                <img id="featured-image" 
+                     src="" 
+                     alt="" 
+                     class="w-full h-64 sm:h-80 lg:h-96 object-cover rounded-lg">
+            </div>
 
             <!-- Content -->
             <div class="p-6 sm:p-8">
                 <div class="prose prose-lg max-w-none">
-                    <div class="text-gray-700 leading-relaxed whitespace-pre-line text-base sm:text-lg">
-                        {{ product.description }}
+                    <div id="article-content-text" class="text-gray-700 leading-relaxed whitespace-pre-line text-base sm:text-lg">
+                        <!-- Content will be inserted here -->
                     </div>
                 </div>
             </div>
@@ -66,11 +73,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <div class="font-medium text-gray-900">
-                            {% if product.user %}
-                                <p>Author: {{ product.user.username }}</p>
-                            {% else %}
-                                <p>Author: Anonymous</p>
-                            {% endif %}
+                            <p id="article-author">Author: Loading...</p>
                         </div>
                         <p class="text-sm text-gray-500">Author</p>
                     </div>
@@ -79,4 +82,57 @@
         </article>
     </div>
 </div>
+<script>
+const PRODUCT_ID = "{{ product.id }}";
+const PRODUCT_DETAIL_URL = "{% url 'main:show_json_by_id' product.id %}";
+
+const loadingState = document.getElementById("loading-state");
+const errorState = document.getElementById("error-state");
+const article = document.getElementById("article-content");
+
+const nameEl = document.getElementById("article-name");
+const imageContainer = document.getElementById("featured-image-container");
+const imageEl = document.getElementById("featured-image");
+const contentEl = document.getElementById("article-content-text");
+const authorEl = document.getElementById("article-author");
+const badgesContainer = document.getElementById("badges-container");
+
+async function loadProductDetail() {
+  try {
+    const res = await fetch(PRODUCT_DETAIL_URL);
+    if (!res.ok) throw new Error("Failed to fetch product");
+    const product = await res.json();
+
+    nameEl.textContent = product.name;
+    contentEl.textContent = product.description;
+    authorEl.textContent = `Author: ${product.user_username || "Anonymous"}`;
+
+    // Thumbnail
+    if (product.thumbnail) {
+      imageEl.src = product.thumbnail;
+      imageEl.alt = product.name;
+      imageContainer.classList.remove("hidden");
+    }
+
+    // Category badge
+    const categoryName = product.category.charAt(0).toUpperCase() + product.category.slice(1);
+    badgesContainer.innerHTML = `
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-pink-600 text-white">
+        ${categoryName}
+      </span>
+    `;
+
+    // Hide loading and show article
+    loadingState.classList.add("hidden");
+    article.classList.remove("hidden");
+  } catch (err) {
+    console.error(err);
+    loadingState.classList.add("hidden");
+    errorState.classList.remove("hidden");
+  }
+}
+
+loadProductDetail();
+</script>
+
 {% endblock content %}

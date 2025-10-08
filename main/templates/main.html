@@ -4,7 +4,11 @@
 {% block meta %}
 <title>Snitch Football</title>
 {% endblock meta %}
-
+<button
+  onclick="showToast('Sample Title', 'This is a sample message for the toast notification.')"
+>
+  Click to Show Toast
+</button>
 {% block content %}
 {% include 'navbar.html' %}
 <div class="bg-gray-50 w-full pt-16 min-h-screen">
@@ -12,45 +16,64 @@
 
     <!-- Header Section -->
     <div class="mb-8">
-      {% if selected_category %}
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ selected_category|title }} Products</h1>
-        <p class="text-gray-600">Showing all {{ selected_category|title }} category products</p>
-      {% else %}
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">New Football Products</h1>
-        <p class="text-gray-600">Stay updated with the updated and featured football products</p>
-      {% endif %}
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">New Arrival</h1>
+      <p class="text-gray-600">Stay tuned for our upcoming products!</p>
     </div>
+  <!-- Button to open modal -->
+    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-white text-pink-600 font-semibold outline outline-2 outline-pink-600 outline-offset-[-2px] rounded-md hover:bg-pink-600 hover:text-white transition-colors mb-4">
+      Create Product by AJAX
+    </button>
     <!-- Filter Section -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 bg-white rounded-lg border border-gray-200 p-4">
       <div class="flex space-x-3 mb-4 sm:mb-0">
-        <a href="?" class="{% if request.GET.filter == 'all' or not request.GET.filter  %} bg-pink-600 text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-pink-600 hover:text-white">
+        <a id="filter-all" class="bg-pink-600 text-white px-4 py-2 rounded-md font-medium transition-colors hover:bg-pink-700">
           All Product
         </a>
-        <a href="?filter=my" class="{% if request.GET.filter == 'my' %} bg-pink-600 text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-pink-600 hover:text-white">
+        <a id="filter-my" class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md font-medium transition-colors hover:bg-pink-600 hover:text-white">
           My Product
         </a>
       </div>
       {% if user.is_authenticated %}
-        <div class="text-sm text-gray-500">
-          Last login: {{ last_login }}
-        </div>
+        <div class="text-sm text-gray-500">Last login: {{ last_login }}</div>
       {% endif %}
     </div>
 
+    <div class="flex flex-wrap gap-2 mt-4 sm:mt-0">
+      {% for key, value in Product.CATEGORY_CHOICES %}
+        <button 
+          class="category-btn bg-white text-gray-700 border border-gray-300 px-3 py-1.5 rounded-md text-sm font-medium hover:bg-pink-600 hover:text-white transition-colors"
+          data-category="{{ key }}">
+          {{ value }}
+        </button>
+      {% endfor %}
+    </div>
+    <!-- Loading State -->
+    <div id="loading" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
+      <svg class="animate-spin h-8 w-8 text-pink-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <p class="text-gray-600 mt-3">Loading Page...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error" class="hidden"></div>
+
     <!-- Product Grid -->
     {% if not product_list %}
-      <div class="bg-white rounded-lg border border-gray-200 p-12 text-center">
+      <!-- Empty State -->
+      <div id="empty" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
         <div class="w-32 h-32 mx-auto mb-4">
           <img src="{% static 'image/no-product.png' %}" alt="No product available" class="w-full h-full object-contain">
         </div>
         <h3 class="text-lg font-medium text-gray-900 mb-2">No product found</h3>
-        <p class="text-gray-500 mb-6">Be the first to get football goods.</p>
+        <p class="text-gray-500 mb-6">Be the first to add something new!</p>
         <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors">
           Create Product
         </a>
       </div>
     {% else %}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div id="grid" class="hidden"></div>
         {% for product in product_list %}
           {% include 'card_product.html' with product=product %}
         {% endfor %}
@@ -58,4 +81,189 @@
     {% endif %}
   </div>
 </div>
+....
+<script>
+// Configuration
+const PRODUCT_API_ENDPOINT = "{% url 'main:show_json' %}";
+const CURRENT_USER_ID = "{{ user.id|default_if_none:'' }}";
+
+// DOM Elements
+const loadingSpinner = document.getElementById('loading');
+const errorMessage = document.getElementById('error');
+const emptyStateDisplay = document.getElementById('empty');
+const productGridContainer = document.getElementById('grid');
+const showAllProductButton = document.getElementById('filter-all');
+const showMyProductButton = document.getElementById('filter-my');
+
+// State Variables
+let activeFilter = 'all';
+let allProductData = [];
+
+// Update filter button appearance
+function buildProductCardElement(item) {
+    const article = document.createElement('article');
+    article.className = 'bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full';
+
+    const linkDetail = `{% url 'main:show_product' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
+    const linkEdit = `{% url 'main:edit_product' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
+    const linkDelete = `{% url 'main:delete_product' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
+
+    const name = DOMPurify.sanitize(item.name);
+    const description = DOMPurify.sanitize(item.description);
+    const price = DOMPurify.sanitize(item.price);
+    const category = DOMPurify.sanitize(item.category);
+    const thumbnail = DOMPurify.sanitize(item.thumbnail);
+    const isFeatured = item.is_featured;
+
+    const thumbnailHtml = DOMPurify.sanitize(
+        item.thumbnail ? `<img src='${thumbnail}' alt='${name}' class='w-full h-full object-cover'>` : `<div class='w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center'></div>`
+    );
+    const categoryLabel = DOMPurify.sanitize(getReadableCategoryName(category));
+    const featuredLabel = isFeatured ? DOMPurify.sanitize(`<span class='inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800'>Featured</span>`) : '';
+    const hotLabel = isHot ? DOMPurify.sanitize(`<span class='inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800'>Hot</span>`) : '';
+
+    const editDeleteHtml = CURRENT_USER_ID && Number(CURRENT_USER_ID) === Number(item.user_id)
+        ? `<div class='flex space-x-2'>
+            <a href='${linkEdit}' class='text-gray-600 hover:text-gray-700 text-sm transition-colors'>Edit</a>
+            <a href='${linkDelete}' class='text-red-600 hover:text-red-700 text-sm transition-colors' onclick='return confirm("Are you sure you want to delete this article?")'>Delete</a>
+          </div>`
+        : '';
+
+    const cardHtml = `
+        <div class="aspect-[16/9] relative overflow-hidden">
+          ${thumbnailHtml}
+          <div class="absolute top-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-pink-600 text-white">${categoryLabel}</span>
+          </div>
+          <div class="absolute top-3 right-3 flex space-x-2">
+            ${featuredLabel}
+            ${hotLabel}
+          </div>
+        </div>
+        <div class="p-5 flex flex-col flex-1">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 leading-tight">
+            <a href="${linkDetail}" class="hover:text-pink-600 transition-colors">${name}</a>
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">${description}</p>
+          <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+            <a href="${linkDetail}" class="text-pink-600 hover:text-pink-700 font-medium text-sm transition-colors">Read more</a>
+            ${editDeleteHtml}
+          </div>
+        </div>
+    `;
+    
+    article.innerHTML = cardHtml;
+    return article;
+}
+// Render all productItem cards
+function renderAllProductCards(productItems) {
+  productGridContainer.innerHTML = '';
+  productItems.forEach(productItem => {
+    const cardElement = buildProductCardElement(productItem);
+    productGridContainer.appendChild(cardElement);
+  });
+}
+
+// Filter and display product
+function filterAndDisplayProduct() {
+  updateFilterButtonsAppearance();
+  
+  const filteredProduct = activeFilter === 'all' 
+    ? allProductData 
+    : allProductData.filter(product => Number(product.user_id) === Number(CURRENT_USER_ID));
+  
+  if (filteredProduct.length === 0) {
+    displayPageSection({ showEmpty: true });
+  } else {
+    renderAllProductCards(filteredProduct);
+    displayPageSection({ showGrid: true });
+  }
+}
+
+// Fetch product data from server
+async function fetchProductFromServer() {
+  try {
+    displayPageSection({ showLoading: true });
+    
+    const response = await fetch(PRODUCT_API_ENDPOINT, {
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch Product data from server');
+    }
+
+    const ProductData = await response.json();
+    allProductData = ProductData || [];
+    
+    filterAndDisplayProduct();
+  } catch (error) {
+    console.error('Error loading Product:', error);
+    displayPageSection({ showError: true });
+  }
+}
+
+// Event handlers
+function handleShowAllProductClick() {
+  activeFilter = 'all';
+  filterAndDisplayProduct();
+}
+
+function handleShowMyProductClick() {
+  activeFilter = 'my';
+  filterAndDisplayProduct();
+}
+// Fetch and display products by category
+async function fetchProductsByCategory(category) {
+  try {
+    displayPageSection({ showLoading: true });
+    
+    const response = await fetch(`/category/${category}/`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch products for category: ${category}`);
+    }
+
+    const products = await response.json();
+
+    if (products.length === 0) {
+      displayPageSection({ showEmpty: true });
+    } else {
+      renderAllProductCards(products);
+      displayPageSection({ showGrid: true });
+    }
+
+  } catch (error) {
+    console.error('Error loading category:', error);
+    displayPageSection({ showError: true });
+  }
+}
+
+// Initialize page
+function initializeProductPage() {
+  showAllProductButton.addEventListener('click', handleShowAllProductClick);
+  showMyProductButton.addEventListener('click', handleShowMyProductClick);
+  // Add listeners to category buttons
+  document.querySelectorAll('.category-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      const category = this.dataset.category;
+      fetchProductsByCategory(category);
+    });
+  });
+
+  fetchProductFromServer();
+}
+
+// Start application
+initializeProductPage();
+
+// Add event listener to detect new product
+document.addEventListener('productAdded', function() {
+    // Refresh data without page reload
+    fetchProductFromServer();
+});
+
+</script>
 {% endblock content %}
