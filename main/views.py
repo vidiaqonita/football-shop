@@ -14,6 +14,8 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
+import requests, json
+
 # Create your views here.
 
 @login_required(login_url='/login')
@@ -34,6 +36,50 @@ def show_main(request):
 
     return render(request, "main.html", context)
 
+@login_required(login_url='/login')
+def show_user_products(request):
+    """
+    Menampilkan daftar produk yang hanya dibuat oleh pengguna yang sedang login.
+    """
+    # 1. Menggunakan .filter(user=request.user) untuk mengambil hanya produk milik user
+    product_list = Product.objects.filter(user=request.user)
+    
+    context = {
+        'app' : 'Snitch Football',
+        'name': 'Vidia Qonita Ahmad',
+        'npm' : '2406345381',
+        'class': 'PBP B',
+        'product_list': product_list,
+        'last_login': request.COOKIES.get('last_login', 'Never'),
+        # Tambahkan flag untuk membedakan tampilan (jika diperlukan di template)
+        'is_user_view': True,
+    }
+
+    # Anda bisa menggunakan template yang sama jika strukturnya cocok
+    return render(request, "main.html", context)
+@login_required(login_url='/login')
+def show_json_user_products(request):
+    """
+    Mengembalikan data produk dalam format JSON, HANYA untuk user yang login.
+    """
+    # Filter produk hanya milik user yang sedang login
+    product_list = Product.objects.filter(user=request.user)
+    
+    data = [
+        {
+            'id': str(product.id),
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'category': product.category,
+            'thumbnail': product.thumbnail,
+            'is_featured': product.is_featured,
+            'user_id': product.user_id,
+        }
+        for product in product_list
+    ]
+
+    return JsonResponse(data, safe=False)
 @login_required(login_url='/login')
 def show_product(request, id):
     product = get_object_or_404(Product, pk=id)
@@ -218,3 +264,30 @@ def proxy_image(request):
         )
     except requests.RequestException as e:
         return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+    
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        name = strip_tags(data.get("name", ""))  # Strip HTML tags
+        price = data.get("price", 0)     
+        description = strip_tags(data.get("description", ""))  # Strip HTML tags
+        category = data.get("category", "")
+        thumbnail = data.get("thumbnail", "")
+        is_featured = data.get("is_featured", False)
+        user = request.user
+        
+        new_product = Product(
+            name=name, 
+            price=price,
+            description=description,
+            category=category,
+            thumbnail=thumbnail,
+            is_featured=is_featured,
+            user=user
+        )
+        new_product.save()
+        
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)

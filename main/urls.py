@@ -1,6 +1,6 @@
 from django.urls import path
 from main.views import create_product, show_product, show_main, show_xml, show_json, show_xml_by_id, show_json_by_id
-from main.views import register, login_user, logout_user, delete_product, edit_product, category_view, add_product_entry_ajax, proxy_image
+from main.views import register, login_user, logout_user, delete_product, edit_product, category_view, add_product_entry_ajax, proxy_image, create_product_flutter, show_json_user_products, show_user_products
 app_name = 'main'
 
 urlpatterns = [
@@ -19,4 +19,7 @@ urlpatterns = [
     path('category/<str:category>/', category_view, name='category_view'),
     path('create-product-ajax', add_product_entry_ajax, name='add_product_entry_ajax'),
     path('proxy-image/', proxy_image, name='proxy_image'),
+    path('create-flutter/', create_product_flutter, name='create_product_flutter'),
+    path('my-products/', show_user_products, name='show_user_products'),
+    path('my-products-json/', show_json_user_products, name='show_json_user_products'),
 ]
